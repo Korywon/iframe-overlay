@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>iframe demo</title>
+    <script src="/scripts/jquery-3.4.1.min.js" type="text/javascript"></script>
+    <script src="/scripts/iframe-overlay.js" type="text/javascript"></script>
     <style>
         html, body {
             font-family: Arial, Helvetica, sans-serif;
@@ -41,35 +43,10 @@
             cursor: pointer;
         }
     </style>
-
     <script type="text/javascript">
-        function on () {
-            let overlayRoot = document.getElementById("overlay-root");
-            let iframeOverlay = document.getElementById("overlay");
-
-            // loads the child page to the iframe            
-            iframeOverlay.src = "/child-page.html";
-            
-            // when iframe loads, show the iframe
-            iframeOverlay.onload = function () {
-                overlayRoot.style.display = "block";
-                iframeOverlay.style.display = "block";
-                // sets iframe overlay callback function to null
-                iframeOverlay.onload = null;
-            }
-        }
-
-        function off () {
-            let overlayRoot = document.getElementById("overlay-root");
-            let iframeOverlay = document.getElementById("overlay");
-
-            // clears the iframe
-            iframeOverlay.src = "";
-            
-            // sets overlay root and iframe overlay display to none
-            overlayRoot.style.display = "none";
-            iframeOverlay.style.display = "none";
-        }
+        $(document).ready(function() {
+            createOverlay("overlay-background", "overlay-iframe");
+        });
     </script>
 </head>
 <body>
@@ -78,10 +55,7 @@
         <p>
             Click the button to open a window.
         </p>
-        <button onclick="on();">Open</button>
-    </div>
-    <div class="overlay-root" id="overlay-root">
-        <iframe id="overlay" class="overlay" name="overlay"></iframe>
+        <button onclick="loadOverlay('child-page.html');">Open</button>
     </div>
 </body>
 </html>
