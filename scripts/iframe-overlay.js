@@ -6,28 +6,31 @@
  * TODO: Add method to customize CSS of overlay.
  */
 
-let overlayBackgroundElementId = null;
-let overlayIframeElementId = null;
+
+let overlays = [];
 
 /**
  * Creates and initializes the overlay elements.
  * @param {String} backgroundId 
  * @param {String} iframeId 
  */
-function createOverlay (backgroundId, iframeId) {
+function createOverlay (name) {
+    if (overlays.indexOf(name) !== -1) {
+        console.error(`[ ERROR ] Overlay with ${name} already exists.`);
+        return;
+    }
+
+    overlays.push(name);
+
     // creates div and iframe elements
     let overlayBackgroundElement = document.createElement("div");
     let overlayIframeElement = document.createElement("iframe");
 
-    // sets background and iframe element id variables
-    overlayBackgroundElementId = backgroundId;
-    overlayIframeElementId = iframeId;
-
     // sets name and id attributes
-    overlayBackgroundElement.setAttribute("id", backgroundId);
-    overlayBackgroundElement.setAttribute("name", backgroundId);
-    overlayIframeElement.setAttribute("id", iframeId);
-    overlayIframeElement.setAttribute("name", iframeId);
+    overlayBackgroundElement.setAttribute("id", name + "-bg");
+    overlayBackgroundElement.setAttribute("name", name + "-bg");
+    overlayIframeElement.setAttribute("id", name + "-iframe");
+    overlayIframeElement.setAttribute("name", name + "-iframe");
 
     // adds styles to overlay background and iframe elements
     addOverlayBackgroundStyle(overlayBackgroundElement);
@@ -80,10 +83,10 @@ function addOverlayIframeStyle (overlayIframeElement) {
 /**
  * Shows the overlay.
  */
-function showOverlay () {
-    if (checkOverlay()) {
-        document.getElementById(overlayBackgroundElementId).style.display = "block";
-        document.getElementById(overlayIframeElementId).style.display = "block";
+function showOverlay (name) {
+    if (checkOverlay(name) && overlays.indexOf(name) !== -1) {
+        getOverlayBackground(name).style.display = "block";
+        getOverlayIframe(name).style.display = "block";
         console.log("[ DONE ] Overlay shown.");
         return true;
     } else {
@@ -95,10 +98,10 @@ function showOverlay () {
 /**
  * Hides the overlay.
  */
-function hideOverlay () {
-    if (checkOverlay()) {
-        document.getElementById(overlayBackgroundElementId).style.display = "none";
-        document.getElementById(overlayIframeElementId).style.display = "none";
+function hideOverlay (name) {
+    if (checkOverlay(name) && overlays.indexOf(name) !== -1) {
+        getOverlayBackground(name).style.display = "none";
+        getOverlayIframe(name).style.display = "none";
         console.log("[ DONE ] Overlay hidden.");
         return true;
     } else {
@@ -109,10 +112,11 @@ function hideOverlay () {
 
 /**
  * Sets the iframe src.
+ * @param {String} name
  * @param {String} src 
  */
-function setOverlayIframeSrc (src) {
-    let iframe = getOverlayIframe();
+function setOverlayIframeSrc (name, src) {
+    let iframe = getOverlayIframe(name);
     if (iframe) {
         iframe.setAttribute("src", src);
     } else {
@@ -121,15 +125,16 @@ function setOverlayIframeSrc (src) {
 }
 
 /**
- * Loads the src into the iframe.
+ * Loads the src into the iframe then shows it
+ * @param {String} name
  * @param {String} src 
  */
-function loadOverlay (src) {
-    let iframe = getOverlayIframe();
+function loadOverlay (name, src) {
+    let iframe = getOverlayIframe(name);
     if (iframe) {
         iframe.setAttribute("src", src);
         iframe.onload = function () {
-            showOverlay();
+            showOverlay(name);
             iframe.onload = null;
         }
     } else {
@@ -140,22 +145,30 @@ function loadOverlay (src) {
 /**
  * Clears the overlay by setting a blank src and hiding the overlay.
  */
-function clearOverlay () {
-    setOverlayIframeSrc("");
-    hideOverlay();
+function clearOverlay (name) {
+    setOverlayIframeSrc(name, "");
+    hideOverlay(name);
+}
+
+/**
+ * Remove the overlay from the document completely.
+ * TODO: Implement function.
+ */
+function removeOverlay (name) {
+    console.warn("[ WARNING ] Function not implemented.");
 }
 
 /**
  * Checks integrity of the entire overlay.
  */
-function checkOverlay () {
+function checkOverlay (name) {
     var valid = true;
-    if (!getOverlayBackground()) {
-        console.error("[ ERROR ] Overlay background does not exist.");
+    if (!getOverlayBackground(name)) {
+        console.error(`[ ERROR ] Overlay ${name} background does not exist.`);
         valid = false;
     }
-    if (!getOverlayIframe()) {
-        console.error("[ ERROR ] Overlay iframe does not exist.");
+    if (!getOverlayIframe(name)) {
+        console.error(`[ ERROR ] Overlay ${name} iframe does not exist.`);
         valid = false;
     }
     return valid;
@@ -164,15 +177,15 @@ function checkOverlay () {
 /**
  * Checks integrity of the overlay background.
  */
-function getOverlayBackground () {
-    let background = document.getElementById(overlayBackgroundElementId);
+function getOverlayBackground (name) {
+    let background = document.getElementById(name + "-bg");
     return background;
 }
 
 /**
  * Checks integrity of the overlay iframe.
  */
-function getOverlayIframe () {
-    let iframe = document.getElementById(overlayIframeElementId);
+function getOverlayIframe (name) {
+    let iframe = document.getElementById(name + "-iframe");
     return iframe;
 }

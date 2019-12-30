@@ -10,7 +10,8 @@
     <script src="/scripts/iframe-overlay.js" type="text/javascript"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            createOverlay("overlay-background", "overlay-iframe");
+            createOverlay("overlay-1");
+            createOverlay("overlay-2");
         });
     </script>
 </head>
@@ -20,7 +21,8 @@
         <p>
             Click the button to open a window.
         </p>
-        <button onclick="loadOverlay('child-page.html');">Open</button>
+        <button onclick="loadOverlay('overlay-1', 'child-page-1.html');">Open Child Page 1</button>
+        <button onclick="loadOverlay('overlay-2', 'child-page-2.html');">Open Child Page 2</button>
     </div>
 </body>
 </html>
