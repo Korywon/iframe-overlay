@@ -1,6 +1,9 @@
 /**
  * Library JavaScript file that is used to create overlays.
  * @author Alvin Huynh
+ * 
+ * TODO: Add return values using async and promises.
+ * TODO: Add method to customize CSS of overlay.
  */
 
 let overlayBackgroundElementId = null;
