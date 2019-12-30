@@ -63,7 +63,7 @@ function addOverlayBackgroundStyle (overlayBackgroundElement) {
 
 /**
  * Adds CSS style to iframe overlay element.
- * @param {*} overlayIframeElement 
+ * @param {Element} overlayIframeElement 
  */
 function addOverlayIframeStyle (overlayIframeElement) {
     overlayIframeElement.style.border = "1px solid black";
@@ -97,6 +97,7 @@ function showOverlay (name) {
 
 /**
  * Hides the overlay.
+ * @param {String} name
  */
 function hideOverlay (name) {
     if (checkOverlay(name) && overlays.indexOf(name) !== -1) {
@@ -125,11 +126,11 @@ function setOverlayIframeSrc (name, src) {
 }
 
 /**
- * Loads the src into the iframe then shows it
+ * Loads the src into the iframe then shows it.
  * @param {String} name
  * @param {String} src 
  */
-function loadOverlay (name, src) {
+function openOverlay (name, src) {
     let iframe = getOverlayIframe(name);
     if (iframe) {
         iframe.setAttribute("src", src);
@@ -143,11 +144,33 @@ function loadOverlay (name, src) {
 }
 
 /**
+ * Loads the src into the iframe.
+ * @param {String} name 
+ * @param {String} src 
+ */
+function loadOverlay (name, src) {
+    let iframe = getOverlayIframe(name);
+    if (iframe) {
+        iframe.setAttribute("src", src);
+    } else {
+        console.error("[ ERROR ] Overlay iframe does not exist.");
+    }
+}
+
+/**
  * Clears the overlay by setting a blank src and hiding the overlay.
+ */
+function closeOverlay (name) {
+    setOverlayIframeSrc(name, "");
+    hideOverlay(name);
+}
+
+/**
+ * Clears the overlay by setting a blank src.
+ * @param {String} name 
  */
 function clearOverlay (name) {
     setOverlayIframeSrc(name, "");
-    hideOverlay(name);
 }
 
 /**
