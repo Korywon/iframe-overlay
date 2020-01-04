@@ -199,6 +199,16 @@ function clearOverlay (name) {
  */
 function removeOverlay (name) {
     console.warn("[ WARNING ] Function not implemented.");
+    if (overlays.indexOf(name) !== -1) {
+        let overlay = getOverlayBackground(name);
+        overlay.parentNode.removeChild(overlay);
+        overlays.splice(overlays.indexOf(name), 1);
+        console.log(`[ DONE ] Overlay ${name} removed.`);
+        return true;
+    } else {
+        console.error(`[ ERROR ] Overlay ${name} cannot be removed.`);
+        return false;
+    }
 }
 
 /**
