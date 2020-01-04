@@ -40,7 +40,7 @@ function createOverlay (name) {
     overlayBackgroundElement.appendChild(overlayIframeElement);
     document.body.appendChild(overlayBackgroundElement);
 
-    console.log("[ DONE ] Overlay elements created and appended to root document.");
+    console.log(`[ DONE ] Overlay ${name} created and appended to root document.`);
 }
 
 /**
@@ -120,8 +120,10 @@ function setOverlayIframeSrc (name, src) {
     let iframe = getOverlayIframe(name);
     if (iframe) {
         iframe.setAttribute("src", src);
+        return true;
     } else {
         console.error("[ ERROR ] Overlay iframe does not exist.");
+        return false;
     }
 }
 
@@ -138,8 +140,10 @@ function openOverlay (name, src) {
             showOverlay(name);
             iframe.onload = null;
         }
+        return true;
     } else {
         console.error("[ ERROR ] Overlay iframe does not exist.");
+        return false;
     }
 }
 
@@ -152,8 +156,10 @@ function loadOverlay (name, src) {
     let iframe = getOverlayIframe(name);
     if (iframe) {
         iframe.setAttribute("src", src);
+        return true;
     } else {
         console.error("[ ERROR ] Overlay iframe does not exist.");
+        return false;
     }
 }
 
@@ -161,8 +167,16 @@ function loadOverlay (name, src) {
  * Clears the overlay by setting a blank src and hiding the overlay.
  */
 function closeOverlay (name) {
-    setOverlayIframeSrc(name, "");
-    hideOverlay(name);
+    let success = true;
+    success = setOverlayIframeSrc(name, "");
+    success = hideOverlay(name);
+    if (success) {
+        console.log(`[ DONE ] Overlay ${name} closed.`);
+    } else {
+        console.error(`[ ERROR ] Overlay ${name} could not be closed.`);
+    }
+
+    return success;
 }
 
 /**
@@ -170,7 +184,13 @@ function closeOverlay (name) {
  * @param {String} name 
  */
 function clearOverlay (name) {
-    setOverlayIframeSrc(name, "");
+    if (setOverlayIframeSrc(name, "")) {
+        console.log(`[ DONE ] Overlay ${name} cleared.`);
+        return true;
+    } else {
+        console.error(`[ ERROR ] Overlay ${name} could not be cleared.`);
+        return false;
+    }
 }
 
 /**
