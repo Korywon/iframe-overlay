@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Library JavaScript file that is used to create overlays.
  * @author Alvin Huynh
