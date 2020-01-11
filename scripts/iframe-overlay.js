@@ -19,10 +19,13 @@ let overlays = {};
 function createOverlay (name, backgroundStyles, iframeStyles) {
     if (overlays.hasOwnProperty(name)) {
         console.error(`[ ERROR ] Overlay with ${name} already exists.`);
-        return;
+        return false;
     }
 
-    overlays[name] = {};
+    overlays[name] = {
+        backgroundStyles: backgroundStyles,
+        iframeStyles: iframeStyles
+    };
 
     // creates div and iframe elements
     let overlayBackgroundElement = document.createElement("div");
@@ -43,13 +46,14 @@ function createOverlay (name, backgroundStyles, iframeStyles) {
     document.body.appendChild(overlayBackgroundElement, iframeStyles);
 
     console.log(`[ DONE ] ${name} created and appended to root document.`);
+    return true;
 }
 
 /**
  * Adds CSS style to background overlay element.
  * @param {*} overlayBackgroundElement 
  */
-function addOverlayBackgroundStyle (overlayBackgroundElement) {
+function addOverlayBackgroundStyle (overlayBackgroundElement, backgroundStyles) {
     overlayBackgroundElement.style.position = "fixed";
     overlayBackgroundElement.style.display = "none";
     overlayBackgroundElement.style.width = "100%";
@@ -61,6 +65,15 @@ function addOverlayBackgroundStyle (overlayBackgroundElement) {
     overlayBackgroundElement.style.bottom = "0";
     overlayBackgroundElement.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
     overlayBackgroundElement.style.zIndex = 1;
+
+    // if object, loop through each key and set style to it
+    if (typeof backgroundStyles === 'object') {
+        for (let key in backgroundStyles) {
+            if (backgroundStyles.hasOwnProperty(key) && typeof backgroundStyles[key] === 'string') {
+                overlayBackgroundElement.style[key] = backgroundStyles[key];
+            }
+        }
+    }
 }
 
 /**
@@ -80,6 +93,15 @@ function addOverlayIframeStyle (overlayIframeElement, iframeStyles) {
     overlayIframeElement.style.right = "0";
     overlayIframeElement.style.bottom = "0";
     overlayIframeElement.style.zIndex = "2";
+    
+    // if object, loop through each key and set style to it
+    if (typeof iframeStyles === 'object') {
+        for (let key in iframeStyles) {
+            if (iframeStyles.hasOwnProperty(key) && typeof iframeStyles[key] === 'string') {
+                overlayIframeElement.style[key] = iframeStyles[key];
+            }
+        }
+    }
 }
 
 /**
@@ -134,13 +156,16 @@ function setOverlayIframeSrc (name, src) {
  * @param {String} name
  * @param {String} src 
  */
-function openOverlay (name, src) {
+function openOverlay (name, src, parameters) {
     let iframe = getOverlayIframe(name);
     if (iframe) {
         iframe.setAttribute("src", src);
         iframe.onload = function () {
             showOverlay(name);
             iframe.onload = null;
+            iframe.contentWindow.overlay = {};
+            iframe.contentWindow.overlay.parameters = parameters;
+            console.log(`[ DONE ] ${name} open and loaded with ${src}.`)
         }
         return true;
     } else {
@@ -150,15 +175,20 @@ function openOverlay (name, src) {
 }
 
 /**
- * Loads the src into the iframe.
+ * Loads the src into the iframe. Does not show the iframe.
  * @param {String} name 
  * @param {String} src 
  */
-function loadOverlay (name, src) {
+function loadOverlay (name, src, parameters) {
     let iframe = getOverlayIframe(name);
     if (iframe) {
         iframe.setAttribute("src", src);
-        console.log(`[ DONE ] ${name} loaded with ${src}.`)
+        iframe.onload = function () {
+            iframe.onload = null;
+            iframe.contentWindow.overlay = {};
+            iframe.contentWindow.overlay.parameters = parameters;
+            console.log(`[ DONE ] ${name} loaded with ${src}.`)
+        }
         return true;
     } else {
         console.error(`[ ERROR ] ${name} iframe does not exist.`);
@@ -171,12 +201,14 @@ function loadOverlay (name, src) {
  */
 function closeOverlay (name) {
     let success = true;
+    let iframe = getOverlayIframe(name);
+    console.log(iframe.contentWindow.overlay.returnValue);
     success = setOverlayIframeSrc(name, "");
     success = hideOverlay(name);
     if (success) {
-        console.log(`[ DONE ] Overlay ${name} closed.`);
+        console.log(`[ DONE ] ${name} closed.`);
     } else {
-        console.error(`[ ERROR ] Overlay ${name} could not be closed.`);
+        console.error(`[ ERROR ] ${name} could not be closed.`);
     }
 
     return success;
@@ -188,10 +220,10 @@ function closeOverlay (name) {
  */
 function clearOverlay (name) {
     if (setOverlayIframeSrc(name, "")) {
-        console.log(`[ DONE ] Overlay ${name} cleared.`);
+        console.log(`[ DONE ] ${name} cleared.`);
         return true;
     } else {
-        console.error(`[ ERROR ] Overlay ${name} could not be cleared.`);
+        console.error(`[ ERROR ] ${name} could not be cleared.`);
         return false;
     }
 }
@@ -205,10 +237,10 @@ function removeOverlay (name) {
         let overlay = getOverlayBackground(name);
         overlay.parentNode.removeChild(overlay);
         delete overlays[name];
-        console.log(`[ DONE ] Overlay ${name} removed.`);
+        console.log(`[ DONE ] ${name} removed.`);
         return true;
     } else {
-        console.error(`[ ERROR ] Overlay ${name} cannot be removed.`);
+        console.error(`[ ERROR ] ${name} cannot be removed.`);
         return false;
     }
 }
@@ -219,11 +251,11 @@ function removeOverlay (name) {
 function checkOverlay (name) {
     var valid = true;
     if (!getOverlayBackground(name)) {
-        console.error(`[ ERROR ] Overlay ${name} background does not exist.`);
+        console.error(`[ ERROR ] ${name} background does not exist.`);
         valid = false;
     }
     if (!getOverlayIframe(name)) {
-        console.error(`[ ERROR ] Overlay ${name} iframe does not exist.`);
+        console.error(`[ ERROR ] ${name} iframe does not exist.`);
         valid = false;
     }
     return valid;

@@ -7,6 +7,28 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Child Page 2</title>
   <link href="/styles/style.css" rel="stylesheet">
+  <script src="/scripts/jquery-3.4.1.min.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    $(document).ready(() => {
+      if (window.overlay) {
+        console.log(window.overlay.parameters);
+        window.overlay.returnValue = {
+          var1: 0,
+          var2: 3,
+          var3: "some third value",
+          var4: "fourth value!",
+          var5: [ 1, 2, 3, 4, 5 ],
+          var6: {
+            test1: 0,
+            test2: 3,
+            test3: 5
+          }
+        };
+      } else {
+        console.warn('[ WARN ] Window overlay object is initialized.');
+      }
+    })
+  </script>
 </head>
 
 <body>
