@@ -7,11 +7,15 @@
     <title>iframe demo</title>
     <link href="/styles/style.css" rel="stylesheet">
     <script src="/scripts/jquery-3.4.1.min.js" type="text/javascript"></script>
-    <script src="/scripts/iframe-overlay.js" type="text/javascript"></script>
+    <script src="/scripts/iframe-overlay-1.0.0.js" type="text/javascript"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            createOverlay("overlay-1", null, null);
-            createOverlay("overlay-2", null, null);
+            createOverlay("overlay-1", null, null, (returnValue) => {
+                console.log(returnValue);
+            });
+            createOverlay("overlay-2", null, null, (returnValue) => {
+                console.log(returnValue);
+            });
         });
     </script>
 </head>
@@ -21,8 +25,24 @@
         <p>
             Click the button to open a window.
         </p>
-        <button onclick="openOverlay('overlay-1', '/child-page-1.html', 'hello');">Open Child Page 1</button>
-        <button onclick="openOverlay('overlay-2', '/child-page-2.html', 'hello');">Open Child Page 2</button>
+        <button onclick="
+            openOverlay(
+                'overlay-1',
+                '/child-page-1.html',
+                {test1: 'oof', var2: 'oof again', var3: 5 }
+            );"
+        >Open Child Page 1</button>
+        <button onclick="
+            openOverlay(
+                'overlay-2',
+                '/child-page-2.html', 
+                {
+                    var1: 'oof',
+                    var2: 'another oof!',
+                    var3: 10585
+                }
+            );"
+        >Open Child Page 2</button>
     </div>
 </body>
 </html>

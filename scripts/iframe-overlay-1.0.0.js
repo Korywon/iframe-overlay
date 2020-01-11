@@ -3,9 +3,7 @@
 /**
  * Library JavaScript file that is used to create overlays.
  * @author Alvin Huynh
- * 
- * TODO: Add return values using async and promises.
- * TODO: Add method to customize CSS of overlay.
+ * @version 1.0.0
  */
 
 
@@ -15,8 +13,10 @@ let overlays = {};
  * Creates and initializes the overlay elements.
  * @param {String} backgroundId 
  * @param {String} iframeId 
+ * @param {Function} callbackFn
+ * @param {Array} callbackParams
  */
-function createOverlay (name, backgroundStyles, iframeStyles) {
+function createOverlay (name, backgroundStyles, iframeStyles, callbackFn, callbackParams) {
     if (overlays.hasOwnProperty(name)) {
         console.error(`[ ERROR ] Overlay with ${name} already exists.`);
         return false;
@@ -24,7 +24,9 @@ function createOverlay (name, backgroundStyles, iframeStyles) {
 
     overlays[name] = {
         backgroundStyles: backgroundStyles,
-        iframeStyles: iframeStyles
+        iframeStyles: iframeStyles,
+        callbackFn: callbackFn,
+        callbackParams: callbackParams,
     };
 
     // creates div and iframe elements
@@ -155,6 +157,7 @@ function setOverlayIframeSrc (name, src) {
  * Loads the src into the iframe then shows it.
  * @param {String} name
  * @param {String} src 
+ * @param {*} parameters
  */
 function openOverlay (name, src, parameters) {
     let iframe = getOverlayIframe(name);
@@ -202,7 +205,11 @@ function loadOverlay (name, src, parameters) {
 function closeOverlay (name) {
     let success = true;
     let iframe = getOverlayIframe(name);
-    console.log(iframe.contentWindow.overlay.returnValue);
+
+    // applies parameters to the overlay's callback function
+    overlays[name].callbackFn.call(this, iframe.contentWindow.overlay.returnValue);
+
+    // sets blank src and hides overlay
     success = setOverlayIframeSrc(name, "");
     success = hideOverlay(name);
     if (success) {
@@ -219,7 +226,15 @@ function closeOverlay (name) {
  * @param {String} name 
  */
 function clearOverlay (name) {
-    if (setOverlayIframeSrc(name, "")) {
+    let success = true;
+    let iframe = getOverlayIframe(name);
+
+    // applies return value to overlay's callback function
+    overlays[name].callbackFn.call(this, iframe.contentWindow.overlay.returnValue);
+
+    // sets blank src
+    success = setOverlayIframeSrc(name, "");
+    if (success) {
         console.log(`[ DONE ] ${name} cleared.`);
         return true;
     } else {
